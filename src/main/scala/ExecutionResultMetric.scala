@@ -1,0 +1,1 @@
+case class ExecutionResultMetric(timeUsed: Long, memoryUsed: Long)
