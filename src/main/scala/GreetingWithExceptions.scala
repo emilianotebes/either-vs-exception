@@ -4,8 +4,7 @@ class GreetingWithExceptions {
     try {
       greetButMayFail(i)
     } catch {
-      case e: MyBusinessException => e.getMessage
-      case _ => "WTF?"
+      case exception: Exception => exception.getMessage
     }
   }
 

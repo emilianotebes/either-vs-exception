@@ -12,6 +12,7 @@ class SomeWeirdTest extends AnyFlatSpec with should.Matchers {
 
     val times = 10000000
 
+    println("Running " + times + " times. Be patient...")
     val executionMetricWithExceptions = runNTimes(times, { i => {
       greetingWithExceptions.greet(i)
     }
@@ -53,20 +54,21 @@ class SomeWeirdTest extends AnyFlatSpec with should.Matchers {
 
   }
 
-  def runNTimes(times: Int, myMethod: Int => String): ExecutionResultMetric = {
+  def runNTimes(times: Int, methodCallback: Int => String): ExecutionResultMetric = {
     var totalUsedMemory = 0L
     var totalUsedTime = 0L
 
     for (i <- 1 to times) {
-      val initialTimeNanos = System.nanoTime()
       val initialFreeMemory = Runtime.getRuntime.freeMemory()
-      myMethod(i)
-      val finalFreeMemory = Runtime.getRuntime.freeMemory()
+      val initialTimeNanos = System.nanoTime()
+      methodCallback(i)
       val finalTimeNanos = System.nanoTime()
-      val usedMemory = finalFreeMemory - initialFreeMemory
-      if (usedMemory > 0) {
+      val finalFreeMemory = Runtime.getRuntime.freeMemory()
+      val usedMemoryInIteration = initialFreeMemory - finalFreeMemory
+      if (usedMemoryInIteration > 0) {
+        totalUsedMemory = totalUsedMemory + usedMemoryInIteration
+      } else {
         //Discarding iteration if unlucky enough to get garbage collection in middle.
-        totalUsedMemory = totalUsedMemory + usedMemory
       }
       totalUsedTime = totalUsedTime + finalTimeNanos - initialTimeNanos
     }
